@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <QtHelpProject version="1.0">
+     <namespace>boost</namespace>
+		 <virtualFolder>doc</virtualFolder>
+     <filterSection>
+         <filterAttribute>boost</filterAttribute>
+         <!-- WARNING: DONT CHANGE ANYTHING IN THIS FILE ESPECIALLY THE LINE POSITIONS - THE SOURCEMAKER DEPENDS ON THIS -->
+         <toc>
+					 <section title="Boost Manual" ref="index.html">
+					 </section>
+         </toc>
+         <files>         	
+				 </files>
+     </filterSection>
+ </QtHelpProject>

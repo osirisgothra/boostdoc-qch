@@ -1,0 +1,62 @@
+ 
+ COMPILING
+
+ Copyright (C) 2013-2014 Gabriel T. Sharp
+ 
+ This file is part of boost qch help generator.
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Compiling instructions:
+
+ - to recreate the documentation, you must first destroy the generated files:
+
+ 		make clean
+
+ - then re-create them:
+
+    make
+
+
+ - there is no `make install`, just drop boost.qch wherever you want it
+
+ - if you should find problems not listed in BUGS please notify the author
+
+ - see README for information on the files and about how to contact the author
+
+ - the README also will show you which files are (Generated), dont delete files
+   that are not generated because you will not be able to recreate them if you
+	 run make!
+
+ - Only use this tool if you are sure you know what you are doing
+
+ - Copy a newer boost documentation (ie, 1.55) on top of this directory and follow
+   the steps above if you require a different version
+
+ - The boost 1.54 documentation is included to show where the files must go
+
+ - If you redistribute this you must redistribute everything included as per the
+   license agreement (not charge for inclusion, etc)
+
+ - For non-commercial use only unless by the author's permission, granted otherwise
+
+
+
+
+
+	
+
+
+

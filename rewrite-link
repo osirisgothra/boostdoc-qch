@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# rewrite-link
+#
+# syntax: rewrite-link [input-file]
+#
+
+if cat "$1" | sed "s/..\/..\/doc\/src\///g" &> /tmp/rewrite-link.txt; then
+
+	DEST1=$(tempfile)
+	DEST=$(tempfile)
+	OLDFILE="/tmp$PWD/$1"
+	TEMPDIR="$(dirname /tmp$PWD/$1)"
+	mkdir -p "$TEMPDIR"
+	cat "$1" | sed "s/..\/..\/doc\/src\///g" > $DEST1
+	cat "$DEST1" | sed "s/\.\.\/\.\.\///g" > $DEST
+	if cp "$1" "$OLDFILE" -f; then
+		if cp "$DEST" "$1" -f; then
+			echo "rewrote link of $1, backed up into $OLDFILE"
+		else
+			echo "rewrite failed, old file in $OLDFILE"
+		fi
+	else
+			echo "backup into $OLDFILE failed, skipping"
+	fi
+
+else
+	
+	echo "rewrite link failed because file missing or sed failure (see /tmp/rewrite-link.txt)"
+
+fi
+
+
