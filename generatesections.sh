@@ -10,6 +10,34 @@
 # warning: the original list will be deleted without mercy
 #
 
+# get_html_title [filename]
+function get_html_title()
+{
+	if [[ -r "$1" ]]; then
+		cat "$1" | tr '\n' ' ' | grep -Po "(?<=<title>).*(?=</title>)"
+		return 0
+	else
+		return 1
+	fi
+}
+# returns [true] = "Title Text"  [false] = (nothing)
+
+# get_file_section_entry [filename]
+function get_file_section_entry()
+{
+	
+}
+# returns [true] = 
+#   <section title="Title Text" ref="file.name">
+#         [false] = (nothing)
+
+# get_section_endtag [no arguments]
+function get_section_endtag()
+{
+	echo "</section>"
+}
+
+
 echo "generating sections, this make take a second..."
 echo "removing old (if existing)"
 rm sections.list -f
