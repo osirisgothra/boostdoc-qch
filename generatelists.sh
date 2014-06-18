@@ -14,10 +14,14 @@
 [[ $1 ]] || set -- --noopt
 
 # required bash shell options
+# described in order of inclusion:
+# 1 return nothing if glob matches nothing
+# 2 needed for x() pattern matching verbatim 
+# 3 needed for ** recursion glob
 
 shopt -s nullglob
 shopt -s globstar
-shopt -s ext
+shopt -s extglob
 
 case $1 in
  --backup)
@@ -36,32 +40,23 @@ esac
 
 echo "generating files.list (used for insertion into qhp files)..."
 find -regextype posix-egrep -iregex '.*\.(png|html|css|htm)' | sed --regexp-extended 's/^(\.\/)(.*)$/<file>\2<\/file>/g' > files.list
-echo "generating files-unformatted.list (used for keyword collection and link-rewriting operations)..."
-find -regextype posix-egrep -iregex '.*' | sed --regexp-extended 's/^(\.\/)(.*)$/\2/g' > files-unformatted.list.pre
-echo "polishing files-unformatted.list..."
-cat files-unformatted.list.pre | grep ".*\.git.*" --invert-match > files-unformatted.list.pre2
-# polish by entry start
-mapfile ITEMS < files-unformatted.list.pre
-touch files-unformatted.list
-for item in "${ITEMS[@]}"; do
-	unset ADDIT   	
-	if [[ -d "$item" ]]; then
-		if (ls $item/*.html | grep -P '\b\.html\b' -q); then
-	 		ADDIT=TRUE
-		fi	 
-	else
-		if [[ ${item##*.} == html ]]; then
-			ADDIT=TRUE
-		fi
-	if [[ $ADDIT == TRUE ]]; then
-    echo "$item" >> files-unformatted.list
-	fi
+echo "begin [multiple steps]: generating files-unformatted.list (used for keyword collection and link-rewriting operations)..."
+echo "generating unique list of directories with keyword files..."
+find -type f -iregex ".*.html" -exec dirname '{}' ';' | sort | uniq > unique.list
+echo "loading directories..."
+mapfile ITEMS < unique.list
+echo "creating list..."
+echo -ne "[s"
+for item in ${ITEMS[@]}; do
+echo "[1K[u[sprocessing ${item}..."
+echo $item >> filedirs.list
+find $item -maxdepth 1 -iname '*.html' >> filedirs.list
 done
-
-# polish by entry end
-
+echo "cleaning up and writing to files-unformatted.list..."
+cat filedirs.list | sed "s/^\.\///g" > files-unformatted.list
+echo "done: generating files-unformatted.list"
 echo "cleaning up intermediate files..."
-rm files-unformatted.list.pre  -f 
-rm files-unformatted.list.pre2 -f
+rm unique.list -f 
+rm filedirs.list -f
 echo "done."
 

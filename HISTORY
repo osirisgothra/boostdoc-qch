@@ -1,17 +1,53 @@
-# Copyright (C) 2013-2014 Gabriel T. Sharp
-# 
-# This file is part of boost qch help generator.
-# 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ HISTORY
+
+ Historical Changes, Additions, Subtractions, and other stuff!
+
+ Copyright (C) 2013-2014 Gabriel T. Sharp
+ 
+ This file is part of boost qch help generator.
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ June 15, 2014 - Version 0.0.1
+ -----------------------------
+ Experimental Phase
+ ------------------
+ 0.0.1 - 6-15-14 - Initial Project Creation
+ 0.0.1 - 6-16-14 - First Test - Works (but without images and some missing links) but not all content files included
+ 0.0.1 - 6-17-14 - Test - Works with all images/links included + content (no keywords or filters planned yet)
+ 0.0.1 - 6-17-14 - Ready for first stable version proceeding last successful test
+
+ Stable Phase
+ ------------------
+ 0.0.1 - 6-17-14 : Promoted to STABLE status 
+
+ June 18, 2014 - Version 0.0.2
+ -----------------------------
+ Experimental Phase
+ ------------------
+ 0.0.2 - 6-18-14 - New branch created and wiki updated to show how version system works, HISTORY, BUGS, README, etc are created
+ 0.0.2 - 6-18-14 - Tests commencing for entire day, targeting Friday June 20 2014 for stable release status day (hopefully)
+
+
+ Footnotes
+ ---------
+
+ This is the history file which contains when tests or experiments happened with the project. Signifigant releases or changes,
+ and any bugfixes that may have been applied (SEE: BUGS). Also, this file is used for day-to-day tracking of the project during
+ it's active state. Each version has two phases, experimental and stable. For information on what constitutes stable and the
+ expermental phases, please refer to the boostdoc-qch wiki, at http://gitorious.org/boostdoc-qch/wiki or contact the author
+ for more information if needed. The author's contact information can be found in the README file. 
+
+ This file's anything is subject to change without notice or obligation to be noticed.
