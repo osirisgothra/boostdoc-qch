@@ -29,6 +29,14 @@
 
     make
 
+ - new step (introduced in 0.0.3) to import your own boost docs into the folder (this is actually symlinked, no copying is done)
+	 note that the version distributed with the tree is not used in this case but it put in "HTML_OFFLINE" for safe keeping:
+
+	 make myown
+
+	 (this will call ./autoimport.sh prior to building, which will do the import, but it wont do it twice so dont worry about that)
+	 Auto-import takes next to no time to do since it just renames some local dirs and symlinks your currently installed one. If you
+	 
 
  - there is no `make install`, just drop boost.qch wherever you want it
 
