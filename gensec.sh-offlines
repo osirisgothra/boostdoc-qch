@@ -1,0 +1,34 @@
+# gensec.sh - these lines are to be injected after code becomes stable to boost performance
+
+function quiet() { eval "$@" &> /dev/null }
+function tempdir() { tmpfile=$(tempfile); if [[ -z $tmpfile ]]; then echo "/tmp"; else echo $(dirname $tmpfile); rm $tmpfile; fi; }
+declare TEMPDIR=$(tempdir)
+
+# create a backing cache
+if quiet sudo -l mount; then	
+	if (! fgrep $PWD/tools /etc/mtab -q); then	
+		mkdir tools
+		mount /dev/ram0 tools -t ramfs
+	fi
+	CACHEDIR=$PWD/tools
+else
+	if [[ -r /dev/shm ]]; then	
+		if mkdir -p /dev/shm/gensec; then
+			CACHEDIR=/dev/shm/gensec
+		fi
+	fi
+fi
+[[ -z $CACHEDIR ]] && mkdir /tmp/gensec && CACHEDIR=/tmp/gensec
+[[ -z $CACHEDIR ]] && { echo "Fatal: no temp directory"; exit 1; }
+
+if cp $(eval ls /{bin,sbin}/$TOOLS /usr/{bin,sbin}/$TOOLS 2> /dev/null) $CACHEDIR -f; then
+	PATH=$CACHEDIR:$PATH
+else
+	echo "Warning: cache disabled"
+fi
+
+
+	
+		
+		
+			

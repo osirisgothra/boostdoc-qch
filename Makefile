@@ -26,7 +26,13 @@ boost.qhp : boost.qhpsrc files-unformatted.list sections.list
 sections.list : files-unformatted.list
 	./generatesections.sh
 
-files-unformatted.list : index.htm
+# using index.html as a tag to failsafe generatelists from being run without documentation in place
+# this prevents it from "running wild" without proper docs 
+# should you get a 'no rule to make index.html' that means you need to copy in the boost documentation first
+# if you downloaded the entire source tree, you dont need to do that, but if you downloaded the snapshot,
+# you will need to add your boost documentation's doc base (the first directory level with an index.html,
+# which is usually /libboostXXX/HTML)
+files-unformatted.list : index.html
 	./generatelists.sh
 
 

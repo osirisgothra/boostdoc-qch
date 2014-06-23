@@ -39,6 +39,22 @@
  ------------------
  0.0.2 - 6-18-14 - New branch created and wiki updated to show how version system works, HISTORY, BUGS, README, etc are created
  0.0.2 - 6-18-14 - Tests commencing for entire day, targeting Friday June 20 2014 for stable release status day (hopefully)
+ 0.0.2 - 6-19-14 - Testing (section generation generatesections)
+ 0.0.2 - 6-20-14 - Problems with xml validation and certain files in the boost library that have PHP integrated in the titles slow progress, new target 6-24-14
+ 0.0.2 - 6-21-14 - Scrapped original generatesections.sh, which worked with the file lists to generate and went back to off-machine design (paper + pencil)
+ 0.0.2 - 6-22-14 - The day was dedicated to the modular design and flowcharting the process, determined that dirwalking was far more stable than list walking
+ 0.0.2 - 6-23-14 - Applied concepts and design to new script, final testing phase succeeded, removed 80% of included documentation for speeding up tests for 6-24 release
+ 
+ Stable Phase
+ -----------------
+ 0.0.2 - 6-24-14 - After succeeding in compiling a working qch with contents, despite some issues (see BUGS), this version is deemed stable and the branch is solidified to release
+
+ June 25, 2014 - Version 0.0.3
+ -----------------------------
+ Experimental Phase
+ ------------------
+ 0.0.3 - 6-25-14 - In this phase, targeting to polish what needs done, not just in BUGS list but also adding of KEYWORDS and (possibly) even FILTERS
+
 
 
  Footnotes

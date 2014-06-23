@@ -1,23 +1,40 @@
-# Copyright (C) 2013-2014 Gabriel T. Sharp
-# 
-# This file is part of boost qch help generator.
-# 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ KNOWN ISSUES
+
+ 	Things that need fixed, things that have been fixed (affixed /w date), and things
+	that cannot be fixed because either I don't know the root cause, or it just is not
+	my problem in the first place (dependency or target).
+
+ Copyright (C) 2013-2014 Gabriel T. Sharp
+ 
+ This file is part of boost qch help generator.
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 qch-boostdoc Known Bugs
 
-- Sections list not completed yet
-- Keywords not completed yet
+6/23/14 RESOLVED - Sections list not completed yet
+- Keywords not completed yet (targeted for 0.0.3)
+- Qt Creator will constantly try to reload if a tree's section is empty or it's children have no html
+  while this is a QTH bug, we will try to insert "dummy" pages that act as a catch-all to avoid these
+- Some pages have code in the titles, these are stripped out. Before I was going to blacklist these files
+  but I know of only one so I kept it and just made sure all titles are valid and < 72 chars long
+  if this is a problem for anyone contact me
+- Some pages are redirectors, I haven't yet written the handlers to smart-link these items yet, this will
+  be addressed in a future version, possible 0.0.3 or 0.0.4
+	
+ONGOING OR POSSIBLE ISSUES (that have not been fully verified or are ambiguous in nature)
+
 - Some links may not be properly rewritten, if this is the case let me know
 

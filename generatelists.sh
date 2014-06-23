@@ -11,6 +11,23 @@
 # warning: the original lists will be deleted without mercy
 #
 
+
+case $- in *i*) $BASH_SOURCE "$@"; return;; esac
+
+# be nice
+if [[ -z $FILES_LIST_RUNNING ]]; then
+	export FILES_LIST_RUNNING=YES
+	nice $BASH_SOURCE "$@"
+	unset FILES_LIST_RUNNING
+	exit $?
+fi
+
+
+[[ -r files.list && -r files-unformatted.list ]] && { echo "file lists already exist, skipping generation"; exit 0; }
+
+echo "preparing to generate file list..."
+sleep 2
+
 [[ $1 ]] || set -- --noopt
 
 # required bash shell options
@@ -48,7 +65,7 @@ mapfile ITEMS < unique.list
 echo "creating list..."
 echo -ne "[s"
 for item in ${ITEMS[@]}; do
-echo "[1K[u[sprocessing ${item}..."
+echo -ne "[1K[u[sprocessing ${item}..."
 echo $item >> filedirs.list
 find $item -maxdepth 1 -iname '*.html' >> filedirs.list
 done
