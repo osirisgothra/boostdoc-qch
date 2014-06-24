@@ -20,7 +20,7 @@ function exec_autoimport()
 			touch .imported
 			mkdir .originals
 			echo "backing up project's original documentation skeleton..."
-			for ITEM in $(cat autoimport.ini); do
+			for ITEM in $(cat autoimportrc); do
 				mv $ITEM .originals
 			done
 			echo "importing boost documentation from ${1}..."

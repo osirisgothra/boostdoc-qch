@@ -47,14 +47,22 @@
  
  Stable Phase
  -----------------
- 0.0.2 - 6-24-14 - After succeeding in compiling a working qch with contents, despite some issues (see BUGS), this version is deemed stable and the branch is solidified to release
+ 0.0.2 - 6-23-14 - After succeeding in compiling a working qch with contents, despite some issues (see BUGS), this version is deemed stable and the branch is solidified to release
+ 0.0.2 - 6-24-14 - fixed two bad date entries in HISTORY (was 6-24 and 6-25, supposed to be 6-23 and 6-24)
 
  June 25, 2014 - Version 0.0.3
  -----------------------------
  Experimental Phase
  ------------------
- 0.0.3 - 6-25-14 - In this phase, targeting to polish what needs done, not just in BUGS list but also adding of KEYWORDS and (possibly) even FILTERS
-
+ 0.0.3 - 6-24-14 - In this phase, targeting to polish what needs done, not just in BUGS list but also adding of KEYWORDS and (possibly) even FILTERS
+ 0.0.3 - 6-24-14 - Added import and mirror scripts. Signed project with a UUID, and secured readonly data (including UUID) with a sha256 checksum file  
+                   Please note that the LICENSE is also hashed, to prevent accidental (or deliberate third party) modifications to the license.
+									 Furthermore, only the LICENSE file should be considered, the other license headers (in varied files) are just there for reference
+									 so you dont have to open LICENSE each time to read it. However, LICENSE is the legally applicable source in any circumstance, so
+									 that is why it is protected with the SHA signature (it would be too much of a headache to do partial checksums for all license headers)
+									 I *may* choose to remove the license headers later on, if need be. I should say *probably*.
+ 0.0.3 - 6-24-14 - Breaking from direct work on project in order to schedule 0.0.3's development cycle, and the when and where of it. This usually takes
+ 									 most of the day so I dont anticipate much actual project changes today (in exception to the ones made this morning, see above).
 
 
  Footnotes
