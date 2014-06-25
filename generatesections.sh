@@ -73,9 +73,9 @@ declare -g INITDIR=$PWD
 declare -ig INDENTS=-1
 declare -ig MAXTITLELEN=71
 declare -ig TOTALCOUNT=0
-declare -i INDEXCOUNT=$(find -type f -iname 'index.htm*' | grep '.*' --count)
-declare -i DIRCOUNT=$(find -type d | grep -P ".*(?<=\/\.).*" -v --count)
-declare -i HTMLCOUNT=$(find -type f -iname '*.htm*' | grep '.*' --count)
+declare -i INDEXCOUNT=$(find -L -type f -iname 'index.htm*' | grep '.*' --count)
+declare -i DIRCOUNT=$(find -L -type d | grep -P ".*(?<=\/\.).*" -v --count)
+declare -i HTMLCOUNT=$(find -L -type f -iname '*.htm*' | grep '.*' --count)
 # since indexes are only used for directory entries (when possible) we         
 # subtract them from the final count however directories always generate       
 # a tag, so we must consider them part of the count                            
