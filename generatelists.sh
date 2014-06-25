@@ -56,10 +56,10 @@ case $1 in
 esac
 
 echo "generating files.list (used for insertion into qhp files)..."
-find -regextype posix-egrep -iregex '.*\.(png|html|css|htm)' | sed --regexp-extended 's/^(\.\/)(.*)$/<file>\2<\/file>/g' > files.list
+find -L -regextype posix-egrep -iregex '.*\.(png|html|css|htm)' | sed --regexp-extended 's/^(\.\/)(.*)$/<file>\2<\/file>/g' > files.list
 echo "begin [multiple steps]: generating files-unformatted.list (used for keyword collection and link-rewriting operations)..."
 echo "generating unique list of directories with keyword files..."
-find -type f -iregex ".*.html" -exec dirname '{}' ';' | sort | uniq > unique.list
+find -L -type f -iregex ".*.html" -exec dirname '{}' ';' | sort | uniq > unique.list
 echo "loading directories..."
 mapfile ITEMS < unique.list
 echo "creating list..."
@@ -67,7 +67,7 @@ echo -ne "[s"
 for item in ${ITEMS[@]}; do
 echo -ne "[1K[u[sprocessing ${item}..."
 echo $item >> filedirs.list
-find $item -maxdepth 1 -iname '*.html' >> filedirs.list
+find -L $item -maxdepth 1 -iname '*.html' >> filedirs.list
 done
 echo "cleaning up and writing to files-unformatted.list..."
 cat filedirs.list | sed "s/^\.\///g" > files-unformatted.list
