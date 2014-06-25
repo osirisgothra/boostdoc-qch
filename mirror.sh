@@ -36,6 +36,49 @@
 # This file is licensed in accord with the rest of the project, see LICENSE
 # which is included in the project's directory.
 
+# size, in MB, to ensure is going to be free AFTER copy, you should only change this 
+# if you need more, it is not recommended to REDUCE this number!!
+# if in vim, you can just put the cursor over the number, and press CTRL+A to increment it
+# or CTRL+X to decrement it, negative numbers will cause bad things to happen, dont do it!
+RUNOUT_PADDING=10
+SIZE1=$(du --max-depth=0 . --total | grep -Po "^[0-9]*(?=\ttotal\$)")
+SIZE2=$(df . | grep Filesystem -v | awk '{ print $4 }')
+SIZE3=$(( SIZE2 - (1024*1024*RUNOUT_PADDING) ))
+if [[ $SIZE3 -lt $SIZE1 ]]; then
+	echo "fatal: you are short $[SIZE1-SIZE2] bytes for the copy, free up some space first!"
+	echo "note that you need to have $SIZE1 plus ${RUNOUT_PADDING}mb free (to avoid runouts from other apps"
+	exit 1
+fi
+
+if [[ ! -r ~/.config/boostdoc-qch/mirror-neverask ]]; then
+	echo "Time (and possibly resource) Consuming Process"
+	echo "----------------------------------------------"
+	echo "This tool makes a mirror copy of the boostdoc directory, and starts a" 
+	echo "new shell in that directory. It also cleans up (unless directed othe-"
+	echo "rwise)  the directory after exiting the shell.  Since copy operations"
+	echo "can be very lengthy,  you are being asked if you wish to proceed now."
+	echo
+	echo -ne "Proceed? (Y=Yes N=No A=Always(Never Ask Me Again!!):"
+	unset REPLY
+	until [[ ${REPLY^^} =~ [YNA] ]]; do
+		read -sn1
+	done
+	case ${REPLY^^} in
+		A)
+			mkdir ~/.config/boostdoc-qch -p
+			touch ~/.config/boostdoc-qch/mirror-neverask
+			echo "NeverAskAgain"
+			;;
+		N)
+			echo "No-Abort"
+			exit 1
+			;;
+		Y)
+			echo "Yes-Proceed"
+			;;
+	esac
+fi
+
 echo "checking current directory..."
 if [[ -r boostdoc-qch-doc.uuid ]] && [[ $(cat boostdoc-qch-doc.uuid) == "e86d1bcf-fcb1-414c-98d0-97eea12d5927" ]]; then
 	echo "verified, checking for mirror signature..."
