@@ -50,7 +50,7 @@
  0.0.2 - 6-23-14 - After succeeding in compiling a working qch with contents, despite some issues (see BUGS), this version is deemed stable and the branch is solidified to release
  0.0.2 - 6-24-14 - fixed two bad date entries in HISTORY (was 6-24 and 6-25, supposed to be 6-23 and 6-24)
 
- June 25, 2014 - Version 0.0.3
+ June 24, 2014 - Version 0.0.3
  -----------------------------
  Experimental Phase
  ------------------
@@ -63,6 +63,19 @@
 									 I *may* choose to remove the license headers later on, if need be. I should say *probably*.
  0.0.3 - 6-24-14 - Breaking from direct work on project in order to schedule 0.0.3's development cycle, and the when and where of it. This usually takes
  									 most of the day so I dont anticipate much actual project changes today (in exception to the ones made this morning, see above).
+ 0.0.3 - 6-25-14 - After a careful check for design issues that might affect the project, ive created the mirror system that will allow expidited testing
+                   without messing up the tree (or git). This is done outside of git so i can test things that might hurt the tree without actually doing it
+									 and since the scripts are symlinks, my changes to them will stick (unless ro is selected). 
+								 - Finished the autoimport and autoimport --undo features, you can now use your own boost documentation although I leave this pretty small 
+								   part of it just so you can get the gist of where it's supposed to go. I may be removing it by 0.0.5, once the groundwork is done.
+                 - Today will be used to address the various issues in the documentation tree: The empty sections, the files that have <meta refresh> tags,
+								   and the empty intermediate directories with non-empty children. These i think make the documentation a little confusing for some. Also,
+									 the first index page is still showing as an absolute path, fixing that as well. It could be a couple days depending on how much time I
+									 have to dedicate to this project. 
+								 - Updated the Start date for 0.0.3 to June 24, not 25th.
+								 - Target stable release dates established: 0.0.3-stable scheduled for June 30th, 2014
+								
+								   
 
 
  Footnotes

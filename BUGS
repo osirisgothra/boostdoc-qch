@@ -1,40 +1,50 @@
- KNOWN ISSUES
 
- 	Things that need fixed, things that have been fixed (affixed /w date), and things
-	that cannot be fixed because either I don't know the root cause, or it just is not
-	my problem in the first place (dependency or target).
+                                                    BUGS
 
- Copyright (C) 2013-2014 Gabriel T. Sharp
- 
- This file is part of boost qch help generator.
- 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+Text containing the boostdoc-qch/doc.git project's known, resolved, unconfirmed, obsolete or unresolvable issues
+Each section now headered with an underlined all-caps text for clarity. Please read the LICENSE file for details
+on the license of this project.
 
-qch-boostdoc Known Bugs
+KNOWN ISSUES
+------------
 
-6/23/14 RESOLVED - Sections list not completed yet
 - Keywords not completed yet (targeted for 0.0.3)
+- Filters not completed yet (0.0.4)
+- Advanced help features not completed =>0.0.4
 - Qt Creator will constantly try to reload if a tree's section is empty or it's children have no html
   while this is a QTH bug, we will try to insert "dummy" pages that act as a catch-all to avoid these
 - Some pages have code in the titles, these are stripped out. Before I was going to blacklist these files
   but I know of only one so I kept it and just made sure all titles are valid and < 72 chars long
   if this is a problem for anyone contact me
 - Some pages are redirectors, I haven't yet written the handlers to smart-link these items yet, this will
-  be addressed in a future version, possible 0.0.3 or 0.0.4
-	
-ONGOING OR POSSIBLE ISSUES (that have not been fully verified or are ambiguous in nature)
+  be addressed in a future version, possible 0.0.3 or 0.0.4 [UPDATE: in 0.0.3 for sure.]
+- There are lots of pages (usually redirectors) that are titleless, mostly index pages, which is a problem
+  and I will be addressing this issue in 0.0.3, to point to the first titled .html document
+- Sections that contain several subsections w/o files before reaching one that does (is annoying)
 
+
+RESOLVED ISSUES
+---------------
+
+- Sections list not completed yet [ resolved on June 23, 2014 (0.0.2-stable) ]
+
+UNCONFIRMED ISSUES
+------------------
+
+OBSOLETE OR UNRESOLVABLE
+------------------------
 - Some links may not be properly rewritten, if this is the case let me know
+  UPDATE: no longer rewriting links due to the fact that the project makes use of a user's own boost documentation
+	        which should not be messed with at all, and is usually read only anyway (or it should be).
+					Rewriting links was a trick used earlier in 0.0.1 to bypass some of the root pages, and an attempt to 
+					shrink the tree. Since there are ~14k pages, this is really not for the best. Furthermore, the
+					scripts 'rewritelinks' and 'rewrite-link' have been obolished for safetey's sake. You can however still
+					have this if you download from 0.0.1 or 0.0.2 (but it is not used in 0.0.2).
+						
+
+If you would like to help, feel free to clone and then submit a merge request. Note that I wont always accept the entire
+merge, I will have to weigh it with my own changes. Because of this, it is a good idea to contact me before making changes
+that are large or major. Otherwise, feel free to start a fork featuring your own work on the project, merging as you see fit.
+
+Read the README file for my contact information.
 
