@@ -43,13 +43,14 @@
 RUNOUT_PADDING=10
 SIZE1=$(du --max-depth=0 . --total | grep -Po "^[0-9]*(?=\ttotal\$)")
 SIZE2=$(df . | grep Filesystem -v | awk '{ print $4 }')
-SIZE3=$(( SIZE2 - (1024*1024*RUNOUT_PADDING) ))
+# note: we are comparing 1K blocks, not bytes, so only need to x1024 one time
+SIZE3=$(( $SIZE2 - (1024*$RUNOUT_PADDING) ))
 if [[ $SIZE3 -lt $SIZE1 ]]; then
 	echo "fatal: you are short $[SIZE1-SIZE2] bytes for the copy, free up some space first!"
 	echo "note that you need to have $SIZE1 plus ${RUNOUT_PADDING}mb free (to avoid runouts from other apps"
 	exit 1
 fi
-
+        
 if [[ ! -r ~/.config/boostdoc-qch/mirror-neverask ]]; then
 	echo "Time (and possibly resource) Consuming Process"
 	echo "----------------------------------------------"
@@ -58,6 +59,9 @@ if [[ ! -r ~/.config/boostdoc-qch/mirror-neverask ]]; then
 	echo "rwise)  the directory after exiting the shell.  Since copy operations"
 	echo "can be very lengthy,  you are being asked if you wish to proceed now."
 	echo
+	echo "Space left on drive before: $((SIZE2/1024))MB (on THIS device, not others) "
+	echo "                     after: $(((SIZE2 - SIZE1)/1024))MB (nonsymetrical)"
+	echo "                difference: $((SIZE1/1024))MB (size of tree)"
 	echo -ne "Proceed? (Y=Yes N=No A=Always(Never Ask Me Again!!):"
 	unset REPLY
 	until [[ ${REPLY^^} =~ [YNA] ]]; do
