@@ -19,7 +19,7 @@ shopt -o -u histexpand			 											# i REALLY hate this feature!
 shopt -s checkwinsize                             # for COLUMNS and LINES
 
 if [[ -r sections.list ]]; then
-	echo "sections.list exists, overwrite? (y/n)"
+ 	echo "sections.list exists, overwrite? (y/n)"
 	if [[ $(read; echo ${REPLY^^}) == N ]]; then
 		echo "aborted."
 		exit
