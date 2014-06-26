@@ -1,10 +1,7 @@
 #!/bin/bash                                                                  
 #                     TODO: remove code smells                              #
-#                                                                           #
+#     comments will be removed after 0.0.5-stable is released               #
 #___________________________________________________________________________#
-
-# SAVE CURRENT DIR                                                           
-pushd . &> /dev/null
 
 #shell options: needed for this script and explanations on what they are/why 
 #               they are needed (except for the first one, which is obvious! 
@@ -18,6 +15,7 @@ shopt -o -${XTRACE-u} xtrace	            				# easier trace variable
 shopt -o -u histexpand			 											# i REALLY hate this feature!
 shopt -s checkwinsize                             # for COLUMNS and LINES
 
+#TODO TODO TODO: move to function
 if [[ -r sections.list ]]; then
  	echo "sections.list exists, overwrite? (y/n)"
 	if [[ $(read; echo ${REPLY^^}) == N ]]; then
@@ -25,6 +23,7 @@ if [[ -r sections.list ]]; then
 		exit
 	fi
 fi
+
 # check for grep, ([xargs, locate, find] = in findutils), and xmlstarlet which are required
 function check_dep()
 {	
@@ -37,6 +36,8 @@ function check_dep()
 		return 1
 	fi
 }
+
+#TODO TODO TODO: move to function
 echo "checking script dependencies..."
 declare -i FAILED_DEPENDS=0
 for DEPITEM in grep findutils xmlstarlet; do
@@ -80,21 +81,107 @@ declare -i HTMLCOUNT=$(find -L -type f -iname '*.htm*' | grep '.*' --count)
 # subtract them from the final count however directories always generate       
 # a tag, so we must consider them part of the count                            
 declare -ig FINALCOUNT=$(( HTMLCOUNT - INDEXCOUNT + DIRCOUNT ))
-declare -ix COLUMNS=0 LINES=0
+declare -igx COLUMNS=0 LINES=0
+
+#TODO TODO TODO: move to function
 eval "$(resize | sed 's/^/declare -ix /g' | grep "declare -ix (COLUMNS|LINES)\=[0-9]+;" --line-regexp -Po)"
 if [[ $COLUMNS == 0 || $LINES == 0 ]]; then
 	echo "Warning: can't determine terminal size, guessing standard ${FALLBACK_SCREEN_WIDTH}x${FALLBACK_SCREEN_HEIGHT} screen"
 	COLUMNS=${FALLBACK_SCREEN_WIDTH}
 	LINES=${FALLBACK_SCREEN_HEIGHT}
 fi
+function get_meta_refresh_target()
+{
+	local MFTGT=$(readlink -e $(cat $1 | grep -Po "<meta *.*http-equiv=\"refresh\".*>"  | grep -Po "(?<=URL\=)[^\"]*"))
+	if [[ $? -eq 0 ]]; then
+		echo $MFTGT
+	else
+		echo INVALID
+		return 1
+	fi
+}
+
+# returns 1 when not refresh, 0 when refresh target
+# its up to the caller to determine if the file is readable
+# or if it exists
+function is_meta_refresh()
+{	
+	grep -q "<meta.*refresh.*URL=.*>" ${1}
+	return $?
+}
+
+# return the best match for index.htm[l] preferring index.html over index.htm
+# or it's meta refresh target
+function get_best_index()
+{
+	# always prefer html first (see root:index.htm for reasoning)
+	for IDXF in *(index.html) *(index.htm); do
+		if is_meta_refresh $IDXF; then
+			get_meta_refresh_target $IDXF			
+		else
+			echo $IDXF
+		fi
+		return
+	done
+	# no index
+	echo "none"
+	return 1
+	
+}
+
+# used to find the index in this order:
+# 1: a 'real' index.html with no 'meta refresh' content
+# 2: if index.html has a meta refresh tag, use that file
+# 3: if no index.html at all, use the first html file in the directory
+# 4: no html content in this directory? recurse to find the index below this directory.
+#    and use that index (it will return 1 if nothing was found below it)
+# 5: directory does not have any html below it, return "1" so we know to skip the branch 
+#    this is how we prevent empty branches from being generated
+# WARNING: recursive function, make sure any additional vars are declare with "local"
+function get_index_file()
+{
+	local ITEM="" HTMLS DIRS IDX
+	IDX=$(get_best_index)
+	if [[ -r $IDX ]]; then
+		echo $IDX
+		return 0
+	else
+		DIRS=(*/)
+		HTMLS=(!(index).htm?)
+		if [[ ${#HTMLS[@]} == 0 ]]; then			
+			# no html here, lets delegate to the children
+			if [[ ${#DIRS[@]} -gt 0 ]]; then
+				# there are directories, check them one by one until a match or ceiling is found
+				for ITEM in ${DIRS[@]}; do
+					cd $ITEM
+					if get_index_file; then
+						cd ..
+						return 0
+					else
+						cd ..
+					fi
+				done
+			fi
+			# fall through (failed)
+		else
+			# return first non-index html (there are a few non-index meta refreshers
+			# however this _shouldnt_ happen because they usually refer back to the
+			# index itself (in the ones i have seen) and we just scanned for that.
+			if is_meta_refresh ${HTMLS[0]}; then
+				get_meta_refresh				
+			else
+				echo ${HTMLS[0]}
+			fi
+			return 0
+		fi
+	fi
+	# no luck, empty section with no applicable children, return false
+	return 1
+}
 
 
 # CHANGE TO RIGHT DIR                                                         #
 # [[ "$PWD" != "${BASH_SOURCE%/*}" ]] && cd "${BASH_SOURCE%/*}"               #
-
-
-
-
 #####################################################                         #
 #### WRITE OPENING TAG FOR CURRENT DIRECTORY AND ####                         #
 #### READ ALL HTML AND DIRS IN CURRENT DIRECTORY ####    A1                   #
@@ -120,7 +207,7 @@ function html_title()
 	if [[ -n $TITLE_PROPER ]]; then
 		echo $TITLE_PROPER
 	else
-		DEFAULT_TITLE="${1##*/}"
+		DEFAULT_TITLE="$(basename $(dirname ${1}))"
 		if [[ -n $DEFAULT_TITLE ]]; then
 			echo $DEFAULT_TITLE
 		else
@@ -138,7 +225,8 @@ function echo_section()
 	local SUFF=""
 	local PREF=""
 	local -i PERCENTAGE=$(( (TOTALCOUNT * 100) / (FINALCOUNT) ))
-  echo -n "[2K[sprocessing $PWD .. ${PERCENTAGE}% done[u"
+  #echo -n "[2K[sprocessing $PWD .. ${PERCENTAGE}% done[u"
+	echo "processing $PWD .. ${PERCENTAGE}% done" # non-ansi version (use to avoid clobbering debug messages)
 
 	case $TYPE in
 	CLOSE)	
@@ -173,7 +261,7 @@ function echo_section()
 function process_dir()
 {
 	# local variables (must have for recursion)                                 #
-	local ITEM DIR INDENTER ot_ref ot_title INDEXES kk
+	local ITEM DIR INDENTER ot_ref ot_title INDEXES kk skip_section
 	# increment the indent level, note PREFIX and not postfix, and cd on lev>0  #
 	((++INDENTS))
 	#printf "\n%2s %$[COLUMNS-4]s\n" "$INDENTS" "$PWD"
@@ -191,36 +279,60 @@ function process_dir()
 	#for ((kk=0;kk<INDENTS;kk++)); do INDENTER+="\t"; done
 
   # scan index for opening tag data or prepare a dummy tag
-	INDEXES=(index.@(html|htm))
+	#INDEXES=(index.@(html|htm))
 	# note: PWD will be tacked on in echo_section, dont pass it here
-	if [[ ${#INDEXES[@]} == 0 ]]; then
-		ot_ref="${1#/}"
-		ot_title="${PWD##*/}"
-	else
-		ot_ref="${INDEXES[-1]}"
-		ot_title=$(html_title $ot_ref)
-	fi
+	#if [[ ${#INDEXES[@]} == 0 ]]; then
+	#	ot_ref="${1#/}"
+	#	ot_title="${PWD##*/}"
+	#else
+	#	ot_ref="${INDEXES[-1]}"
+	#	ot_title=$(html_title $ot_ref)
+	#fi
+	ot_ref=$(get_index_file)
+	skip_section=$?
+	ot_title=$(html_title "$ot_ref")
 
-	# create opening tag                                                       #
-	echo_section OPEN "${INDENTER}" "$ot_title" "$ot_ref"	
-	# process HTML files                                                       #
-	for ITEM in !(index).html !(index).htm; do
-		ot_title=$(html_title $ITEM)
-		ot_ref=${ITEM}
-		# please read about UNDERSTANDING INDENTATION on why the extra's needed  #
-		echo_section OPENCLOSE "${INDENTER}" "$ot_title" "$ot_ref"
-	done
-	#  process subdirs (if any) - variables will be preserved as needed        #
-	#  this is recursive, so be careful and keep locals and globals separated  #
-	for DIR in */; do
-		process_dir "${DIR}"
-	done
-	# create the closing tag  #
-	echo_section CLOSE "${INDENTER}"
+	# dont bother if 1 (no html in this dir or child dirs) 
+	# this usually happens with docbook jams and example dirs
+	if [[ $skip_section == 0 ]]; then
+		# create opening tag                                                       #
+		echo_section OPEN "${INDENTER}" "$ot_title" "$ot_ref"	
+		# process HTML files                                                       #
+		for ITEM in !(index).html !(index).htm; do
+			ot_title=$(html_title $ITEM)
+			ot_ref=${ITEM}
+			# please read about UNDERSTANDING INDENTATION on why the extra's needed  #
+			echo_section OPENCLOSE "${INDENTER}" "$ot_title" "$ot_ref"
+	  done
+	
+
+		#  process subdirs (if any) - variables will be preserved as needed        #
+		#  this is recursive, so be careful and keep locals and globals separated  #
+		for DIR in */; do
+			process_dir "${DIR}"
+		done
+		# create the closing tag  #
+		echo_section CLOSE "${INDENTER}"
+	fi
 
 	# decrement (note that it is now POSTFIX not prefix & cd if not at 0-lev  
 	((INDENTS--))	&& cd .. 	
 	
+}
+
+# post processing that is done to list to make it a bit more pretty
+function polish_list()
+{
+	echo "applying polish..."
+	#TODO: replace ref="." section with a nice title
+	#TODO: replace root ref and title with our own page (so we can get some credit)
+	#TODO: remove un-needed intermediate tags (see below)
+	# (FILES)
+	#   (DIR)
+	#     <no files here>      <------- we dont need a tag for this directory
+	#     (DIR/DIR)
+	#        (FILES in DIR/DIR)
+	# END OF TODO s
 }
 
 ## UNDERSTANDING INDENTATION - why an extra \t is needed for file entries    
@@ -281,7 +393,9 @@ function process_dir()
 ################
 
 # used when exiting (if we make it to the end) TODO: move this to the var declaration block
-declare -i RETV=1
+declare -ig RETV=1
+
+#TODO TODO TODO: move to function
 # start - also separates any failure messages from being from the function process_dir
 echo "preparing to process files..."
 process_dir "."
@@ -296,7 +410,6 @@ else
 	echo "validation failed. file not well formed, so we can't use it. see error above for details or contact the author if you think this is a bug."
 fi
 
-# RESTORE CURRENT DIR
-popd &> /dev/null
+
 # give back code, make-boost-qhp.sh will use it to determine if it's ok to generate the .qhp
 exit ${RETV}
