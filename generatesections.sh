@@ -23,6 +23,32 @@ if [[ -r sections.list ]]; then
 		exit
 	fi
 fi
+# if dir has no index.html, and no other html files, keeps searching upwards (diverting)
+# and returns the nearest html, favoring this order: "index.html","index.htm",other htm(l) file
+# other html: picks the first in the list, which is sorted in alphabetical order (a.htm before b.htm)
+function find_nearest_index_or_html()
+{
+	[[ $# > 0 ]] && local -i LEVEL=$[ $1 + 1 ] || local -i LEVEL=0
+	echo "examining $PWD..."
+	local FILES=(@(index).htm?(l) !(index).htm?(l))     # favor index.htm(l) over other html files
+	if [[ ${#FILES[@]} -eq 0 ]]; then
+		for SUBDIR in */; do
+			cd "${SUBDIR}"
+			if $FUNCNAME $LEVEL; then           # allows function to be renamed w/o changing contents
+				return 0
+			fi
+			cd ..
+		done
+	else
+		echo "${FILES[0]#${INITDIR}/}"  # trim prefix directory (make relative)
+		return 0
+ 	fi
+ 	if [[ $LEVEL == 0 ]]; then
+		echo "NONE"
+	fi
+	return 1
+}
+
 
 # check for grep, ([xargs, locate, find] = in findutils), and xmlstarlet which are required
 function check_dep()
@@ -140,43 +166,61 @@ function get_best_index()
 # WARNING: recursive function, make sure any additional vars are declare with "local"
 function get_index_file()
 {
-	local ITEM="" HTMLS DIRS IDX
-	IDX=$(get_best_index)
+	local ITEM="" HTMLS DIRS IDX IDXT
+	IDX=$(get_nearest_index_or_html)
 	if [[ -r $IDX ]]; then
-		echo $IDX
-		return 0
-	else
-		DIRS=(*/)
-		HTMLS=(!(index).htm?)
-		if [[ ${#HTMLS[@]} == 0 ]]; then			
-			# no html here, lets delegate to the children
-			if [[ ${#DIRS[@]} -gt 0 ]]; then
-				# there are directories, check them one by one until a match or ceiling is found
-				for ITEM in ${DIRS[@]}; do
-					cd $ITEM
-					if get_index_file; then
-						cd ..
-						return 0
-					else
-						cd ..
-					fi
-				done
+		if is_meta_refresh $IDX; then			# index passed is also a meta-refresher
+			IDXT=$(get_meta_refresh_target $IDX)
+			if [[ -r $IDXT ]]; then
+				echo "$IDXT"
+			else
+				echo "WARNING: Could Not Read Index for $PWD - PRESS ENTER TO CONTINUE or CTRL+C TO ABORT"
+				read
+				return 1
 			fi
-			# fall through (failed)
 		else
+			echo $IDX												# index is normal HTML
+			return 0
+		fi
+	else
+		return 1													# a competent index was not found anywhere
+  fi
+	
+#		DIRS=(*/)
+#		HTMLS=(!(index).htm?)
+		#TODO: when you get up, please replace this with get_nearest_index_or_html
+
+#		if [[ ${#HTMLS[@]} == 0 ]]; then			
+#			# no html here, lets delegate to the children
+#			if [[ ${#DIRS[@]} -gt 0 ]]; then
+#				# there are directories, check them one by one until a match or ceiling is found
+#				for ITEM in ${DIRS[@]}; do
+#					cd $ITEM
+#					if get_index_file; then
+#						cd ..
+#						return 0
+#					else
+#						cd ..
+#					fi
+#				done
+#			fi
+#
+
+			# fall through (failed)
+#		else
 			# return first non-index html (there are a few non-index meta refreshers
 			# however this _shouldnt_ happen because they usually refer back to the
 			# index itself (in the ones i have seen) and we just scanned for that.
-			if is_meta_refresh ${HTMLS[0]}; then
-				get_meta_refresh				
-			else
-				echo ${HTMLS[0]}
-			fi
-			return 0
-		fi
-	fi
+#			if is_meta_refresh ${HTMLS[0]}; then
+#				get_meta_refresh_target ${HTMLS[0]}
+#			else
+#				echo ${HTMLS[0]}
+#			fi
+#			return 0
+#		fi
+#	fi
 	# no luck, empty section with no applicable children, return false
-	return 1
+#	return 1
 }
 
 
@@ -198,16 +242,17 @@ function html_title()
 {
 	local CONTEXT TITLE_RAW TITLE_COOKED TITLE_PROPER DEFAULT_TITLE
 	CONTEXT=`stat "$1" --format="%s" 2>/dev/null`
-	TITLE_PROPER=""
+	TITLE_PROPER=""                                         
 	if [[ $CONTEXT -gt 0 ]]; then
 		TITLE_RAW=$(grep -Po "(?<=<title>).*(?=</title>)" "$1")
+
 		TITLE_COOKED=${TITLE_RAW//[^A-Za-z0-9 _:.]}
 		TITLE_PROPER=${TITLE_COOKED: 0:$MAXTITLELEN}
 	fi
 	if [[ -n $TITLE_PROPER ]]; then
 		echo $TITLE_PROPER
 	else
-		DEFAULT_TITLE="$(basename $(dirname ${1}))"
+		DEFAULT_TITLE="$(basename $PWD)"
 		if [[ -n $DEFAULT_TITLE ]]; then
 			echo $DEFAULT_TITLE
 		else
