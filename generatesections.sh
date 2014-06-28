@@ -244,8 +244,8 @@ function html_title()
 	CONTEXT=`stat "$1" --format="%s" 2>/dev/null`
 	TITLE_PROPER=""                                         
 	if [[ $CONTEXT -gt 0 ]]; then
-		TITLE_RAW=$(grep -Po "(?<=<title>).*(?=</title>)" "$1")
-
+###################### CURSOR
+	TITLE_RAW=$(grep -Po "(?<=<title>).*(?=</title>)" "$1")		
 		TITLE_COOKED=${TITLE_RAW//[^A-Za-z0-9 _:.]}
 		TITLE_PROPER=${TITLE_COOKED: 0:$MAXTITLELEN}
 	fi

@@ -61,7 +61,10 @@ function exec_autoimport()
 			done
 			echo "importing boost documentation from ${1}..."
 			for ITEM in $TARGET/*; do
-				ln -s $ITEM .
+			# dont use symlinks (like the link to the boost libraries, which only contain source)
+				if [[ ! -L $ITEM ]]; then
+					ln -s $ITEM .
+				fi
 				echo "$ITEM" >> .imported
 			done
 		fi
