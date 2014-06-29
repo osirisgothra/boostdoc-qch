@@ -1,0 +1,113 @@
+## generatelists.smell - smells removed from generatelist.sh
+
+#                     TODO: remove code smells                              #
+#     comments will be removed after 0.0.5-stable is released               #
+#___________________________________________________________________________#
+
+#shell options: needed for this script and explanations on what they are/why 
+#               they are needed (except for the first one, which is obvious! 
+
+# function  get-nearest...dir()
+# if dir has no index.html, and no other html files, keeps searching upwards (diverting)
+# and returns the nearest html, favoring this order: "index.html","index.htm",other htm(l) file
+# other html: picks the first in the list, which is sorted in alphabetical order (a.htm before b.htm)
+
+
+###########################  INDENTS - level which operating on (-1=outside) 
+# SET INITIAL DIRECTORY   #  MAXTITLELEN - max length of a title element to  
+# SET INDENTS TO -1       #                use for output                    
+###########################  *COUNT used for calculating percentage done     
+# use fallback sizes of (default 80x25) if resize / checkwinsize fails
+# needed for funtionality on dumb or severely stupid terminals!! (like null terms)
+# check for grep, ([xargs, locate, find] = in findutils), and xmlstarlet which are required
+# since indexes are only used for directory entries (when possible) we         
+# subtract them from the final count however directories always generate       
+# a tag, so we must consider them part of the count                            
+
+# get_index_file
+# used to find the index in this order:
+# 1: a 'real' index.html with no 'meta refresh' content
+# 2: if index.html has a meta refresh tag, use that file
+# 3: if no index.html at all, use the first html file in the directory
+# 4: no html content in this directory? recurse to find the index below this directory.
+#    and use that index (it will return 1 if nothing was found below it)
+# 5: directory does not have any html below it, return "1" so we know to skip the branch 
+#    this is how we prevent empty branches from being generated
+# WARNING: recursive function, make sure any additional vars are declare with 
+
+# html_title()
+# CHANGE TO RIGHT DIR                                                         #
+# [[ "$PWD" != "${BASH_SOURCE%/*}" ]] && cd "${BASH_SOURCE%/*}"               #
+#####################################################                         #
+#### WRITE OPENING TAG FOR CURRENT DIRECTORY AND ####                         #
+#### READ ALL HTML AND DIRS IN CURRENT DIRECTORY ####    A1                   #
+#### INTO LISTS #####################################                         #
+#####################################################                         #
+# html_title [document]                                                       #
+# for guarenteed-output reasons the following default behavior is:            #
+#  - outputs file's text between an html <title> tag                          #
+#  - filters invalid chars                                                    #
+#  - chops to MAXTITLELEN                                                     #
+#  - if file is unreadable, outputs filename                                  #
+#                                                                             #
+
+
+## UNDERSTANDING INDENTATION - why an extra \t is needed for file entries    
+#dir              indenter				      with file indent        without it   
+#/dir			   			1                    	<dir>                   <dir>        
+#/dir/file        1                      	<file\>               <file\>      
+#/dir/file        1                      	<file\>               <file\>      
+#/dir/dir         2                      	<dir>                  	<dir>      
+#/dir/dir/file1   2                        	<file1>              	<file1>    
+#/dir/dir/file2   2                        	<file2>              	<file2>    
+#/dir/dir/file3   2                        	<file3>              	<file3>    
+#/dir/dir (end)   2                        </dir>                 </dir>     
+#/dir/dir2        2                        <dir2>                 <dir2>     
+#/dir/dir2/file   2                        	<file>              	<file>     
+#/dir/dir2 (end)  2                        </dir2>                </dir2>    
+#/dir (end)       1                    	<dir>                   <dir>        
+
+#  /dir                  1          	<dir>                                                    
+#  /dir/dir              2          		<dir> 
+#  /dir/dir/dir          3          			<dir> 
+#  /dir/dir/dir (end)    3          			</dir>    
+#  /dir/dir/dir          3          			<dir>  
+#  /dir/dir/dir/file     3          				<file>
+#  /dir/dir/dir (end)    3          			</dir>  
+#  /dir/dir (end)        2          		</dir>  
+#  /dir (end)            1          	</dir>  
+#
+# As plainly seen, without file indentation, regardless of the level or      
+# position of ordering the dir/file, files would either line up with dirs    
+# and be hard to read, the other option is to reassign INDENTER more than    
+# one time per iteration which is just plain inefficient, in the above       
+# test, we see that only file indentation does the job just fine             
+# Most standards including W3C, define self-closing tags to be indented but  
+# but not half-closed tags. The indentation increases when a tag is opened,  
+# and decreases when the tag is closed, so essentially, the indents are being
+# incremented and decremented in one swoop. But since that would be very in- 
+# efficient, a \t is simply added for those items. Hope that clears it up.   
+#################################                                            
+#### ITERATE THROUGH LIST:   ####
+#### GET NEXT ITEM IN LIST   #### A2
+#################################
+
+#### IS ITEM DIRECTORY ? ####### Q1
+   # YES save current directory state and
+   #     increment indent and go to ITERATE[A1]     
+   #     using said directory item
+
+##### IS ITEM FILE ? Q2
+    # YES write tag and title with indents 
+		#  NO check for list end or echo error if file isnt html
+
+##### AT END OF LIST? Q3
+		# YES: pop dir from stack, write closing tag and return
+		#  NO: continue above iteration with next item
+
+################
+#  END         #
+################
+
+# used when exiting (if we make it to the end) TODO: move this to the var declaration block
+
