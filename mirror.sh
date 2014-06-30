@@ -8,16 +8,16 @@
 # copies entire branch into a temporary location
 # (three-letter temp signia allows for ~ 16 million unique entries)
 # 
-# Note: this is not to be used as a repo branch replacement, it is meant to
-#       serve as a test location that can be completely destoryed even the
-#       base directory itself can be. No changes are saved from it, either
-#       so DO NOT USE MIRROR DIRECTORIES FOR EDITING SCRIPTS! Use git for
-#       branching experimental changes. In contrast, if the entire project
+# Note: This directory is not to be used as a branch replacement, it is meant to
+#       serve as a test location that can be completely destoryed. It can even 
+#       have it's base destroyed as well. No changes will be saved from it
+#       unless [s]ymlinks are chosen. Without symlinks, DO NOT USE MIRROR 
+#       DIRECTORIES AND THEN EDIT SCRIPTS! Please use git for the purpose of
+#       branching experimental changes. Case in point: if the entire project
 #       directory were corrupted/destroyed/deleted, there would be no going
 #       back except for the copy on gitorious assuming everything was pushed
 #       at the time. Instead the mirror directory is used for testing scripts
 #       to ensure they do not do just that. And if they do, no harm is done.
-#
 # Guidelines
 #
 #     - Please delete mirror directories when done.
