@@ -154,7 +154,7 @@ if mkdir -p $TARGET; then
 		case ${CHOICE} in
 			S) 
 				echo "making symlinks..."
-				for i in *.sh; do
+				for i in *.sh *.pl; do
 					rm $TARGET/$i
 					ln -s $PWD/$i $TARGET/$i
 				done
@@ -168,7 +168,7 @@ if mkdir -p $TARGET; then
 				break;;
 			R)			
 				echo "setting permissions..."
-				chmod a-w $TARGET/*.sh
+				chmod a-w $TARGET/*.sh $TARGET/*.pl
 				break;;				
 		esac
 
