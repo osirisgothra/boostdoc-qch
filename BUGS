@@ -8,7 +8,13 @@ on the license of this project.
 KNOWN ISSUES
 ------------
 
-- Keywords not completed yet (targeted for 0.0.3)
+Current Dev branch only: 
+- May not run due to commits that happen to break the code, this happens. If you really need something to work
+  try rolling back the commit to an earlier one within the dev branch, look at the comments in the logs!!!
+
+Current Stable branch:
+
+- Keywords not completed yet (targeted for 0.0.4)
 - Filters not completed yet (0.0.4)
 - Advanced help features not completed =>0.0.4
 - Qt Creator will constantly try to reload if a tree's section is empty or it's children have no html
@@ -26,7 +32,7 @@ KNOWN ISSUES
 RESOLVED ISSUES
 ---------------
 
-- Sections list not completed yet [ resolved on June 23, 2014 (0.0.2-stable) ]
+- resolved ``Sections list not completed yet'' on June 23, 2014 in 0.0.2-stable
 
 UNCONFIRMED ISSUES
 ------------------
