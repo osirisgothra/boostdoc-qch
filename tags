@@ -1,0 +1,28 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+_choice	generatesections.sh	/^function _choice()$/;"	f
+_err	generatesections.sh	/^function _err()$/;"	f
+_undo	autoimport.sh	/^function _undo()$/;"	f
+calc_file_dir_sizes	generatesections.sh	/^function calc_file_dir_sizes()$/;"	f
+check_dep	generatesections.sh	/^function check_dep()$/;"	f
+check_for_existing_sections_list	generatesections.sh	/^function check_for_existing_sections_list()$/;"	f
+check_script_deps	generatesections.sh	/^function check_script_deps()$/;"	f
+echo_section	generatesections.sh	/^function echo_section()$/;"	f
+exec_autoimport	autoimport.sh	/^function exec_autoimport()$/;"	f
+get_best_index	generatesections.sh	/^function get_best_index()$/;"	f
+get_index_file	generatesections.sh	/^function get_index_file()$/;"	f
+get_meta_refresh_target	generatesections.sh	/^function get_meta_refresh_target()$/;"	f
+get_nearest_index_or_html	generatesections.sh	/^function get_nearest_index_or_html()$/;"	f
+html_title	generatesections.sh	/^function html_title()$/;"	f
+init_global_vars	generatesections.sh	/^function init_global_vars()$/;"	f
+init_list	generatesections.sh	/^function init_list()$/;"	f
+is_meta_refresh	generatesections.sh	/^function is_meta_refresh()$/;"	f
+locate_docs	autoimport.sh	/^function locate_docs()$/;"	f
+polish_list	generatesections.sh	/^function polish_list()$/;"	f
+process_dir	generatesections.sh	/^function process_dir()$/;"	f
+verify_correct_startdir	generatesections.sh	/^function verify_correct_startdir()$/;"	f
+verify_validate	generatesections.sh	/^function verify_validate()$/;"	f

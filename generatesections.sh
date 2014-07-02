@@ -12,10 +12,25 @@ shopt -o -${XTRACE-u} xtrace	            				# easier trace variable
 shopt -o -u histexpand			 											# i REALLY hate this feature!
 shopt -s checkwinsize                             # for COLUMNS and LINES
 
+declare -g PRESS_A_KEY="Press any key to continue..." #needed for _err											
+
 ######################## FUNCTION DECLARATIONS ################################
 
-function check_for_existing_sections_list()
+#F verify_correct_startdir [noparams] 
+function verify_correct_startdir()
 {
+	if [[ -r boostdoc-qch-doc.uuid ]]; then
+		if [[ $(cat boostdoc-qch-doc.uuid) == "e86d1bcf-fcb1-414c-98d0-97eea12d5927" ]]; then
+			return 0
+		fi
+	fi
+	_err "generatesections.sh must be started in the root project directory (where boostdoc-qch-doc.uuid is)" p c
+	return 1	
+}
+
+#F check_for_existing_sections_list [no params]
+function check_for_existing_sections_list()
+{	
 	if [[ -r sections.list ]]; then
 		echo -ne "sections.list exists, overwrite? ([y]/n)"
 		if [[ $(read; echo ${REPLY^^}) == N ]]; then
@@ -26,21 +41,24 @@ function check_for_existing_sections_list()
 	return 0
 }
 
+#F get_nearest_index_or_html [no params] | internally: [start dir]
 function get_nearest_index_or_html()
 {
+	local FILENAME
 	[[ $# > 0 ]] && local -i LEVEL=$[ $1 + 1 ] || local -i LEVEL=0
-	echo "examining $PWD..."
-	local FILES=(@(index).htm?(l) !(index).htm?(l))
+	local FILES=(@(index).html @(index).htm !(index).htm?(l))
 	if [[ ${#FILES[@]} -eq 0 ]]; then
 		for SUBDIR in */; do
 			cd "${SUBDIR}"
 			if $FUNCNAME $LEVEL; then         
+				cd ..
 				return 0
 			fi
 			cd ..
 		done
 	else
-		echo "${FILES[0]#${INITDIR}/}"  # == 'dirname $FILES[0]'
+		FILENAME=${PWD}/${FILES}
+		echo "${FILENAME#${INITDIR}/}"  # == 'dirname $FILES[0]'
 		return 0
  	fi
  	if [[ $LEVEL == 0 ]]; then
@@ -49,7 +67,7 @@ function get_nearest_index_or_html()
 	return 1
 }
 
-
+#F check_dep [package name]
 function check_dep()
 {	
 	return 0
@@ -62,6 +80,7 @@ function check_dep()
 	fi
 }
 
+#F check_script_deps [no params]
 function check_script_deps()
 {
 	echo "checking script dependencies..."
@@ -82,7 +101,7 @@ function check_script_deps()
 	fi
 }
 
-
+#F init_list [no params]
 function init_list()
 {
 	echo "generating xml header..."
@@ -94,6 +113,7 @@ function init_list()
 	fi
 }
 
+#F init_global_vars [no params]
 function init_global_vars()
 {
 	local -i ERRCNT=0
@@ -107,11 +127,13 @@ function init_global_vars()
 	declare -ig INDEXCOUNT=$(find -L -type f -iname 'index.htm*' | grep '.*' --count)       ; ((ERRCNT+=$?)) 
 	declare -ig DIRCOUNT=$(find -L -type d | grep -P ".*(?<=\/\.).*" -v --count)            ; ((ERRCNT+=$?)) 
 	declare -ig HTMLCOUNT=$(find -L -type f -iname '*.htm*' | grep '.*' --count)            ; ((ERRCNT+=$?)) 
-	declare -ig FINALCOUNT=$(( HTMLCOUNT - INDEXCOUNT + DIRCOUNT ))                         ; ((ERRCNT+=$?)) 
+	declare -ig FINALCOUNT=$(( HTMLCOUNT - INDEXCOUNT + DIRCOUNT ))                         ; ((ERRCNT+=$?))
 	declare -igx COLUMNS=0 LINES=0																													; ((ERRCNT+=$?))
-																																														return $ERRCNT
+	declare -ga ARGVS                                                                       ; ((ERRCNT+=$?))
+	return $ERRCNT
 }
 
+#F calc_file_dir_sizes [no params]
 function calc_file_dir_sizes()
 {
 	echo "calculating file and directory counts..."
@@ -124,6 +146,7 @@ function calc_file_dir_sizes()
 }
 
 
+#F get_meta_refresh_target [filename]
 function get_meta_refresh_target()
 {
 	local MFTGT=$(readlink -e $(cat $1 | grep -Po "<meta *.*http-equiv=\"refresh\".*>"  | grep -Po "(?<=URL\=)[^\"]*"))
@@ -135,12 +158,14 @@ function get_meta_refresh_target()
 	fi
 }
 
+#F is_meta_refresh [filename]
 function is_meta_refresh()
 {	
 	grep -q "<meta.*refresh.*URL=.*>" ${1}
 	return $?
 }
 
+#F get_best_index [no params]
 function get_best_index()
 {
 	for IDXF in *(index.html) *(index.htm); do
@@ -155,19 +180,18 @@ function get_best_index()
 	return 1
 }
 
+#F get_index_file [no params]
 function get_index_file()
 {
 	local ITEM="" HTMLS DIRS IDX IDXT
 	IDX=$(get_nearest_index_or_html)
-	if [[ -r $IDX ]]; then
-		if is_meta_refresh $IDX; then			# index passed is also a meta-refresher
-			IDXT=$(get_meta_refresh_target $IDX)
+	if [[ -r $INITDIR/$IDX ]]; then
+		if is_meta_refresh $INITDIR/$IDX; then			# index passed is also a meta-refresher
+			IDXT=$(get_meta_refresh_target $INITDIR/$IDX)
 			if [[ -r $IDXT ]]; then
-				echo "$IDXT"
+				echo "${IDXT#$INITDIR/}"
 			else
-				echo "Can't locate an index for $PWD!!"
-				echo $PRESS_A_KEY
-				read
+				_err "Can't locate an index for $PWD!!" p e						
 				return 1
 			fi
 		else
@@ -175,20 +199,24 @@ function get_index_file()
 			return 0
 		fi
 	else
+		_err "No Index in or below $PWD" n w
 		return 1													# a competent index was not found anywhere
   fi	
 }
 
+#F html_title [filename]
 function html_title()
 {
-	local FILELEN TITLE_RAW TITLE_COOKED DEFAULT_TITLE
+	local FILELEN TITLE_RAW TITLE_COOKED="" DEFAULT_TITLE
 	FILELEN=`stat "$1" --format="%s" 2>/dev/null`
 	TITLE_PROPER=""                                         
 	if [[ $FILELEN -gt 0 ]]; then
-	  TITLE_RAW=$($INITDIR/getelement.pl "$1" TITLE)		
+		TITLE_RAW=$(grep -Poi '(?<=\<title\>)[^\<]*(?=\<\/title\>)' "$1") 
+#   perl implementation, waiting until rest of script is converted to perl		
+#	  TITLE_RAW=$($INITDIR/getelement.pl "$1" TITLE)		
 		if [[ -n $TITLE_RAW ]]; then
-			TITLE_COOKED=$($INITDIR/getent.pl "$TITLE_RAW")				
-		fi
+			TITLE_COOKED="${TITLE_RAW//[^-.;:,_&?A-Za-z0-9# ]}"
+		fi	
 	fi
 	if [[ -n $TITLE_COOKED ]]; then
 		echo $TITLE_COOKED
@@ -202,39 +230,56 @@ function html_title()
 
 }
 
+#F echo_section [CLOSE|OPENCLOSE|OPEN] [indents] [title] [subdirectoryname|filename]
 function echo_section()
 {	
+	ARGVS=("$@")
 	local OUT_REF=""
 	local TYPE=${1}; shift
 	local SUFF=""
+	local OUT_LIST=""
 	local PREF=""
 	local -i PERCENTAGE=$(( (TOTALCOUNT * 100) / (FINALCOUNT) ))
-  echo ${DBGMODE--n} "[2K[sprocessing $PWD .. ${PERCENTAGE}% done[u"
+	case $- in *i*) OUT_LIST=/dev/stdout;;
+							 *)	OUT_LIST=${INITDIR}/sections.list
+						      echo ${DBGMODE--n} "[2K[sprocessing $PWD .. ${PERCENTAGE}% done[u" ;;	
+	esac
 
 	case $TYPE in
-	CLOSE)	
-		echo "${1}</section>" >> ${INITDIR}/sections.list
-		;;
-	OPENCLOSE)
-		SUFF="/"
-		PREF="\t"
-		[[ $INITDIR == $PWD ]] && OUT_REF=${3} || OUT_REF=${PWD#$INITDIR/}/${3}		
-		;;&
-	OPEN)
-		if [[ -f ${3} ]]; then
-			OUT_REF=${PWD#$INITDIR/}/${3}
-		else			
-			OUT_REF=${PWD#$INITDIR}
-		fi
-		
-		;;&
-	OPEN*)
-		((TOTALCOUNT++))
-		echo "${PREF}${1}<section title=\"${2}\" ref=\"${OUT_REF}\"${SUFF}>" >> ${INITDIR}/sections.list
-		;;
+		CLOSE)	
+			echo "${1}</section>" >> ${OUT_LIST}
+			;;
+		OPENCLOSE)
+			SUFF="/"
+			PREF="\t"
+			[[ $INITDIR == $PWD ]] && OUT_REF=${3} || OUT_REF=${PWD#$INITDIR/}/${3}		
+			;;&
+		OPEN)
+			if [[ -f ${3} ]]; then
+				OUT_REF=${PWD#$INITDIR/}/${3}
+			else			
+				OUT_REF=${PWD#$INITDIR}
+			fi
+
+			;;&
+		OPEN*)
+			((TOTALCOUNT++))
+			# verify and write
+			if [[ ${OUT_REF: 1:1} == "/" ]]; then				
+				echo "Command Line: 1=[$1] 2=[$2] 3=[$3] "
+				echo "Command Line(unfiltered): *=[$*] @=[$@] #=[$#]"
+			fi
+			if [[ ! -f "$OUT_REF" ]]; then
+				echo "Command Line: 1=[$1] 2=[$2] 3=[$3] "
+				echo "Command Line(unfiltered): *=[$*] @=[$@] #=[$#]"
+				_err "Item: $OUT_REF does not refer to a file, all entries MUST point to a file!!" p c
+			fi
+			echo "${PREF}${1}<section title=\"${2}\" ref=\"${OUT_REF}\"${SUFF}>" >> ${OUT_LIST}
+			;;
 	esac
 }
 
+# process_dir [start dir]
 function process_dir()
 {
 	local ITEM DIR INDENTER ot_ref ot_title INDEXES kk skip_section
@@ -242,34 +287,43 @@ function process_dir()
 	if [[ $INDENTS -gt 0 ]]; then
 		cd "$1"
 	fi
+	
 	INDENTER=""
+	
 	if [[ $INDENTS -gt 0 ]]; then
 		INDENTER=$(eval printf "\\\t%.0s" {1..$INDENTS})
 	else
 		INDENTER=""
 	fi
-	ot_ref=$(get_index_file)
+
+	ot_ref="$(get_index_file)"
 	skip_section=$?
-	ot_title=$(html_title "$ot_ref")
+	ot_title=$(html_title "$INITDIR/$ot_ref")
+	
 
 	if [[ $skip_section == 0 ]]; then
 		echo_section OPEN "${INDENTER}" "$ot_title" "$ot_ref"	
+ # 	echo "LEVEL: $INDENTS  PWD: $PWD"
+ # 	echo "REF: $ot_ref     TITLE=$ot_title"
 		for ITEM in !(index).html !(index).htm; do
 			ot_title=$(html_title $ITEM)
 			ot_ref=${ITEM}
 			echo_section OPENCLOSE "${INDENTER}" "$ot_title" "$ot_ref"
 	  done
-	fi	
-
-	for DIR in */; do
-		process_dir "${DIR}"
-	done
-	echo_section CLOSE "${INDENTER}"
-
+	
+		for DIR in */; do
+			process_dir "${DIR}"
+		done
+		echo_section CLOSE "${INDENTER}"
+	else
+		# nothing under here, but the dirs were still in the final counts (prefiltering IS slower)
+		((TOTALCOUNT+=$(find -type d | grep --count ".*" --line-regexp)))
+  fi
 	((INDENTS--))	&& cd .. 	
 	return 0
 }
 
+#F polish_list [no params]
 function polish_list()
 {
 	echo "applying polish..."
@@ -278,6 +332,7 @@ function polish_list()
 	#TODO: remove un-needed intermediate tags (see below)
 }
 
+#F verify_validate [no params]
 function verify_validate()
 {
 
@@ -296,6 +351,7 @@ function verify_validate()
 
 }
 
+# _err [text] [pause=p|nopause=n] [kind=e[rr]|w[arn]|c[rit]|i[nf]|custom_name] 
 function _err()
 {
 	local ERRKIND="Error"
@@ -309,9 +365,9 @@ function _err()
 			*) ERRKIND="$3";;
 		esac
 	fi
-	echo "** $ERRKIND (@ $PWD): $1"
-	if [[ $# -ge 2 ]] && [[ $2 == "p" ]]; then #use 'n' or something other than 'p' for no pause
-		echo $PRESS_A_KEY
+	echo "** $ERRKIND (@ $PWD): $1" > $(tty)
+	if [[ $# -ge 2 ]] && [[ $2 == "p" ]]; then 
+		echo $PRESS_A_KEY > $(tty)
 	  unset REPLY
 		read -sn1	
 		if [[ ${REPLY^^} == N ]]; then
@@ -320,23 +376,79 @@ function _err()
 	fi
 }
 
+# _choice [keys(default=yn)] [default-index-when-enter(default=-1, none)] 
+function _choice()
+{
+	[[ $# == 0 ]] && set -- yn -1
+	[[ $# == 2 ]] && local -i DEFAULT=$2 || local -i DEFAULT=-1
+	local RESPONSE="" KEYS=${1} NEXTCHAR=""
+	setterm -c off
+	while (true); do
+		read -sn1 RESPONSE
+		if [[ $RESPONSE ]]; then
+			for ((i=0;i<${#KEYS};i++)); do
+				NEXTCHAR=${KEYS: $i:1}
+				if [[ ${NEXTCHAR^^} == ${RESPONSE^^} ]]; then
+					setterm -c on
+					return $i
+				fi
+			done
+		else
+			if [[ $DEFAULT -ge 0 ]]; then
+				setterm -c on
+				return $DEFAULT
+			fi
+		fi
+		RESPONSE=""		
+	done
+}
+	
+
 
 ############################################### MAIN PROGRAM ##########################################################
 
- 
-
-echo "processing directories, please wait..."
-if check_script_deps; then
-	if init_global_vars; then   # uses dependencies, check them first
-	if calc_file_dir_sizes; then
-	if check_for_existing_sections_list; then
-	if init_list; then
-
-	if process_dir "."; then
-		if verify_validate; then
-			if	polish_list; then
-				exit 0
+if verify_correct_startdir; then
+	if [[ ${-//[^i]} ]]; then      #interactive mode
+		echo "** interactive run detected **"
+		echo "Do you want to load script for debugging?"
+		echo "Note: This WILL overwrite your current shell!"
+		echo "Proceed ([y]/n):"
+		if _choice yn 0; then
+			init_global_vars
+			calc_file_dir_sizes		
+			echo "debug function mode:"
+			echo " - You will need to restart the shell if you want to unload it"
+			echo " - Type [reload] to reload the script"
+			echo " - type [list] for a function list from this script"
+			echo " - use [trcon] and [trcoff] to enable/disble trace"
+			echo " - because of shell options, autocomplete on multiple words won't function,"
+			echo "   enabling that would break functions!"
+			alias reload="pushd .; cd $PWD; source $BASH_SOURCE; popd"
+			alias list="pushd .; cd $PWD; cat $BASH_SOURCE | grep -Po '(?<=^#F ).*' | sort | uniq; popd"
+			alias trcon='set -x'
+			alias trcoff='set +x'
+		else
+			echo "aborted (this does not undo any previous loads)"
+		fi
+	else
+		echo "processing directories, please wait..."
+		if check_script_deps; then
+			if init_global_vars; then   # uses dependencies, check them first
+				if calc_file_dir_sizes; then
+					if check_for_existing_sections_list; then
+						if init_list; then
+							if process_dir "."; then
+								if verify_validate; then
+									if	polish_list; then
+										exit 0
+									fi
+								fi
+							fi
+						fi
+					fi
+				fi
 			fi
 		fi
+		exit 1	
 	fi
-exit 1	
+fi

@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+#   
 # mirror.sh
 #
 # (C)2014 Gabriel Sharp, Paradisim LLC, All Rights Reserved
@@ -19,7 +19,8 @@
 #       at the time. Instead the mirror directory is used for testing scripts
 #       to ensure they do not do just that. And if they do, no harm is done.
 # Guidelines
-#
+#     - Mirror AFTER using autoimport.sh, not before. Using autoimport on a
+#       mirrored directory will unprotect your boost documentation.
 #     - Please delete mirror directories when done.
 #     - Mirrors are placed in ../dir, so dont keep the project in a bottom
 #       level directory (ie, /boostdoc-qch), instead use a nth-level directory
