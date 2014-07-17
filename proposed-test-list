@@ -1,0 +1,50 @@
+
+Proposed Test List
+
+  This is a collection of the  most  trouble-bearing  directories that
+I  have  found  so  far in the boost documentation.  The way I see it,
+they are the  best suited for testing purposes and  will  be  included
+as part of  the 'test  documentation'  along  with the project.  Prior 
+to this time,  only  part of  the 'docs'  subdirectory  was  provided, 
+however it seems to be insuffiecient as it has mostly  'very friendly'
+resources.
+
+  The  following list  contains the resources best suited for the test
+inclusion of the project.  They are ordered by their date-of-inclusion
+(or 'doi'), descending order. These files/directories will be included
+from version  0.0.4-experimental (0.0.3-stable) and forward. This list
+list  may  change  when testing with  1.54 is complete and moves on to
+test later versions (1.55, etc). Please note that empty column entries
+are meant to mean the same as the column entry before it. The list  is
+as follows:
+
+-------------------------------------------------------------------------
+ doi			directory (based at HEAD)				reason for inclusion (initial)
+-------------------------------------------------------------------------
+17-7-14		doc/html/boost_asio/reference   empty entries turning up
+          libs/ptr_container
+          libs/bind                       out-of-root redirected index*
+					libs/circular_buffer            
+					libs/config
+					libs/conversion
+					libs/geometry
+					more
+					tools
+					libs/heap                       redirector to different root**
+-------------------------------------------------------------------------			
+ dor      directory (based at HEAD)       reason for removal 
+-------------------------------------------------------------------------
+17-7-14   doc														  removed pending the new inclu-
+                                          sions above
+-------------------------------------------------------------------------
+
+*  a directory that has no html content, but contains some, so uses the 
+   nearest index it can find, which happens to be a redirector to another
+	 file which is also not in the source directory
+** a directory containing (usually) a single index document, which is a
+   redirector to another, multi-documented part of the tree, usually when
+	 the documentation for libraries placed into a common /doc root.
+	 (ie: /libs/somedir/index.html -> /doc/samelib/index.html)
+
+--------------------- END OF DOCUMENTATION ------------------------------
+
