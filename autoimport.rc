@@ -1,0 +1,18 @@
+// autoimport.rc
+//
+// files in the boost documentation that are considered test subjects
+// these files are overwritten and therefore saved when using autoimport
+// please see the autoimport.sh file for futher details
+//
+
+index.html
+index.htm
+doc
+more
+tools
+rst.css
+LICENSE_1_0.txt
+boost.css
+boost.png
+libs
+
