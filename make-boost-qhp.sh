@@ -8,12 +8,15 @@
 #  only use this if you added files to the help index
 
 # regenerate the file lists
-./generatelists.sh
+if [[ ! -r files.list ]]; then
+	./generatelists.sh
+fi
 
 # regenerate the section lists only if needed (because it takes a while)
 if [[ ! -r sections.list ]]; then
 	./generatesections.sh 
 fi
+
 
 # create the output file
 # the boost.qhpsrc is used to do this in the following manner:
