@@ -8,12 +8,12 @@
 #
 # syntax: ./generatefiles.sh
 #
-# warning: the original lists will be deleted without mercy
+# warning: the original lists will be deleted without (much) mercy
 #
 
 case $- in *i*) $BASH_SOURCE "$@"; return;; esac
 
-# be nice (dont bog down resources)
+# be nice
 if [[ -z $FILES_LIST_RUNNING ]]; then
 	export FILES_LIST_RUNNING=YES
 	nice $BASH_SOURCE "$@"
@@ -56,10 +56,19 @@ case $1 in
 esac
 
 echo "Generating QHP content list..."
-find -L -regextype posix-egrep -iregex '.*\.(png|html|css|htm)' | sed --regexp-extended 's/^(\.\/)(.*)$/<file>\2<\/file>/g' > files.list
+find -L -regextype posix-egrep -iregex '.*\.(png|html|css|htm)' | sed --regexp-extended 's/^(\.\/)(.*)$/<file>\2<\/file>/g' > files_unpol.list
+echo "polishing..."
+cat files_unpol.list | grep "<file>[^\.].*" > files.list
 
-echo "Generating RAW content list..."
-find -L -type f -iregex ".*.html" -exec dirname '{}' ';' | sort | uniq > unique.list
+echo "Preparing to generate RAW content list..."
+echo "finding targets..."
+find -L -type f -iregex ".*.html" -exec dirname '{}' ';' > raw.list
+echo "sorting..."
+cat raw.list | sort > sorted.list
+echo "consolidating..."
+cat sorted.list | uniq > unique.list
+echo "removing temporary files..."
+rm sorted.list raw.list
 
 if [[ -r unique.list ]]; then
 	echo "Loading directories..."
