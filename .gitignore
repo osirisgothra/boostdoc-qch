@@ -1,1 +1,7 @@
 .*.swp
+*temp*
+boost.qch
+boost.qhp
+files-unformatted.list
+files.list
+sections.list
