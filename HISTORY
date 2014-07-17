@@ -54,6 +54,23 @@
  -----------------------------
  Experimental Phase
  ------------------
+ 0.0.3 - 7-14-14 - Back to it, added meta-refresh handlers and indexes/titles for ALL directories is complete. Added title xml codec script to handle
+                   the flaky HTML that is laxed out in some of the files.
+				 7-17-14 - Finished compiling a stable copy of the help document (had to polish but it was 99% good). The most recent will always be included
+				             in the source tree as full-documentation.qch (so it doesnt get overwritten). Also, pre-generated files are NO LONGER supplied. You
+									   MUST build them  yourself (see COMPILING). 
+									 Made all config files (autoimport.rc, etc) have the .rc extension for proper reading in vim, they also have a somewhat limited
+									   syntax capability (blanks ignored, comment lines starting with //), each file explains what is done therein.
+									 Added ALL W3C HTML 4.01 symbols to the list (not that everyone is using them properly in boost). It is used mainly after the
+									   codec script (see next comment).
+									 (re)Added codec script, getent.pl. It will pull, decode, and re-encode HTML strings to be 100% proper. After which, the gensec
+									   script will 'cook' the text into pure XML-compliant entities using the symbol table previously mentioned (250+ symbols).
+									 REMOVED all the old boost documentation previously included in earlier builds. Only "TEST" documentation is included. Which is
+									   stuff that tends to cause the most trouble. This is done because a full build takes up to 30 minutes, which is bad when doing
+										 development. 'Naughty' pages are few and far between. I have identified those pages in proposed-test-list and imported their
+										 branches as part of the test tree. YOU WILL NEED TO USE THE AUTOIMPORT SCRIPT TO ACTUALLY BUILD A WORKING COPY FROM NOW ON!!
+										 (you will be warned by the make script before starting).
+ 0.0.3 - 6-30-14 - Much more work and much less time pave the way for problems, read the README for details on that.
  0.0.3 - 6-24-14 - In this phase, targeting to polish what needs done, not just in BUGS list but also adding of KEYWORDS and (possibly) even FILTERS
  0.0.3 - 6-24-14 - Added import and mirror scripts. Signed project with a UUID, and secured readonly data (including UUID) with a sha256 checksum file  
                    Please note that the LICENSE is also hashed, to prevent accidental (or deliberate third party) modifications to the license.
