@@ -56,7 +56,7 @@ function exec_autoimport()
 			touch .imported
 			mkdir .originals
 			echo "backing up project's original documentation skeleton..."
-			for ITEM in $(cat autoimportrc); do
+			for ITEM in $(cat autoimport.rc | grep -sP "^\s*[^/]{2}.*" | sort | uniq ); do
 				mv $ITEM .originals
 			done
 			echo "importing boost documentation from ${1}..."
